@@ -25,6 +25,12 @@ static void sendError(httplib::Response& res, const std::string& msg, int status
     sendJson(res, {{"error", msg}}, status);
 }
 
+static void triggerExcelSync() {
+    std::thread([]() {
+        system("python server/excel_sync.py 2>nul || python excel_sync.py 2>nul");
+    }).detach();
+}
+
 // ── SERVER RUNNER ─────────────────────────────────────────────────
 void runServer(
     const ServerConfig& config,
@@ -103,6 +109,7 @@ void runServer(
             }
 
             Logger::info("Created employee: " + id + " (" + name + ")");
+            triggerExcelSync();
             sendJson(res, emp.toJson(), 201);
         } catch (const std::exception& e) {
             sendError(res, "Invalid JSON: " + std::string(e.what()), 400);
@@ -114,6 +121,7 @@ void runServer(
         std::string id = req.matches[1];
         if (empRepo->remove(id)) {
             Logger::info("Removed employee: " + id);
+            triggerExcelSync();
             sendJson(res, {{"success", true}, {"message", "Employee removed"}});
         } else {
             sendError(res, "Employee not found", 404);
@@ -207,6 +215,7 @@ void runServer(
             PayrollRecord rec = PayrollCalculator::compute(*emp, month, present, casual, absent);
             if (payrollRepo->saveRecord(rec)) {
                 Logger::info("Saved payroll for " + empId + " (" + month + ")");
+                triggerExcelSync();
                 sendJson(res, rec.toJson());
             } else {
                 sendError(res, "Failed to save payroll", 500);
@@ -241,6 +250,7 @@ void runServer(
 
             if (payrollRepo->saveBatch(month, computed)) {
                 Logger::info("Batch saved " + std::to_string(computed.size()) + " records for " + month);
+                triggerExcelSync();
                 sendJson(res, {
                     {"success", true},
                     {"month", month},
@@ -272,6 +282,7 @@ void runServer(
         std::string empId = req.get_param_value("employeeId");
 
         if (payrollRepo->deleteRecord(month, empId)) {
+            triggerExcelSync();
             sendJson(res, {{"success", true}});
         } else {
             sendError(res, "Record not found", 404);

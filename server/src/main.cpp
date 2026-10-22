@@ -26,6 +26,9 @@ int main(int argc, char* argv[]) {
     auto employeeRepo = std::make_shared<JsonEmployeeRepository>(dataDir + "/employees.json");
     auto payrollRepo = std::make_shared<JsonPayrollRepository>(dataDir + "/payroll.json");
 
+    // Perform initial Excel synchronization on start
+    std::system("python server/excel_sync.py 2>nul || python excel_sync.py 2>nul");
+
     runServer(config, employeeRepo, payrollRepo);
 
     return 0;
