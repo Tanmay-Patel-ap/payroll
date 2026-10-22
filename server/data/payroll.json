@@ -1,0 +1,34 @@
+[
+  {
+    "month":  "October 2026",
+    "designation":  "Senior Accountant",
+    "id":  "EMP001_October 2026",
+    "absentDays":  4,
+    "employeeId":  "EMP001",
+    "casualLeaveDays":  2,
+    "baseSalary":  65000,
+    "employeeName":  "John Doe",
+    "presentDays":  24,
+    "totalDays":  30,
+    "paidDays":  26,
+    "netSalary":  56333.33,
+    "dailyRate":  2166.67,
+    "lossOfPay":  8666.67
+  },
+  {
+    "month":  "October 2026",
+    "designation":  "Finance Manager",
+    "id":  "EMP002_October 2026",
+    "absentDays":  0,
+    "employeeId":  "EMP002",
+    "casualLeaveDays":  2,
+    "baseSalary":  85000,
+    "employeeName":  "Sarah Smith",
+    "presentDays":  28,
+    "totalDays":  30,
+    "paidDays":  30,
+    "netSalary":  85000,
+    "dailyRate":  2833.33,
+    "lossOfPay":  0
+  }
+]

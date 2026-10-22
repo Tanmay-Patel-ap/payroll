@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STIFLINK MANAGEMENT (OPC) PVT. LTD - Payroll &amp; Payslips</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">₹</div>
+      <div class="brand-title">
+        <h1>STIFLINK MANAGEMENT (OPC) PVT. LTD</h1>
+        <span style="font-size: 0.7rem; text-transform: none; letter-spacing: normal;">OFFICE NO. 301 FIFTH FLOOR, ADHARHSILA COMPLEX, GANDHI MAIDAN, PATNA, BIHAR 800001</span>
+      </div>
+    </div>
+
+    <nav class="main-nav">
+      <button class="active" data-tab="bulk-tab">
+        <span>📊</span> Tabular Entry (Bulk)
+      </button>
+      <button data-tab="single-tab">
+        <span>📝</span> Single Entry (Form)
+      </button>
+      <button data-tab="salary-sheet-tab">
+        <span>📋</span> Central Salary Sheet
+      </button>
+      <button data-tab="payslip-tab">
+        <span>🧾</span> Individual Payslip
+      </button>
+      <button data-tab="employees-tab">
+        <span>👥</span> Manage Employees
+      </button>
+    </nav>
+
+    <div class="server-status">
+      <span class="status-dot"></span>
+      <span>C++ Server Active</span>
+    </div>
+  </header>
+
+  <!-- Main Workspace Container -->
+  <main class="container">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: TABULAR ENTRY (BULK SPREADSHEET MODE)-->
+    <!-- ========================================== -->
+    <section id="bulk-tab" class="tab-pane active">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Multiple Tabular Payroll Entry (Spreadsheet Mode)</h2>
+            <p>Quickly enter Present Days, Casual Leaves, and Absent Days for all employees and save in one click.</p>
+          </div>
+          <div style="display: flex; gap: 0.6rem; align-items: center;">
+            <input type="text" id="bulk-month" class="form-control" placeholder="e.g. October 2026" style="width: 170px;" />
+            <button id="bulk-load-btn" class="btn btn-secondary">Load Saved</button>
+            <button id="bulk-quick-fill-btn" class="btn btn-secondary" title="Fill all employees with default days">Quick Fill</button>
+            <button id="bulk-save-all-btn" class="btn btn-success">Save All Entries</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="bulk-table">
+            <thead>
+              <tr>
+                <th>Emp ID</th>
+                <th>Employee Name</th>
+                <th>Base Salary</th>
+                <th>Present Days</th>
+                <th>Casual Leave (Paid)</th>
+                <th>Absent Days (LOP)</th>
+                <th>Paid Days</th>
+                <th>Loss of Pay</th>
+                <th>Net Salary</th>
+              </tr>
+            </thead>
+            <tbody id="bulk-table-tbody">
+              <!-- Dynamically populated by payroll-bulk.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: SINGLE ENTRY FORM                   -->
+    <!-- ========================================== -->
+    <section id="single-tab" class="tab-pane">
+      <div class="card" style="max-width: 750px; margin: 0 auto;">
+        <div class="card-header">
+          <div>
+            <h2>Single Employee Payroll Entry</h2>
+            <p>Select an individual employee to enter days and preview instant salary calculation.</p>
+          </div>
+        </div>
+
+        <form id="single-entry-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="single-month">Month Name *</label>
+              <input type="text" id="single-month" class="form-control" placeholder="e.g. October 2026" required />
+            </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+              <label for="single-emp-select">Select Employee *</label>
+              <select id="single-emp-select" class="form-control" required>
+                <option value="">-- Choose Employee --</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="single-present-days">Present Days</label>
+              <input type="number" step="0.5" min="0" max="31" id="single-present-days" class="form-control" value="26" required />
+            </div>
+
+            <div class="form-group">
+              <label for="single-casual-days">Casual Leave Days (Paid)</label>
+              <input type="number" step="0.5" min="0" max="31" id="single-casual-days" class="form-control" value="0" required />
+            </div>
+
+            <div class="form-group">
+              <label for="single-absent-days">Absent Days (Unpaid / LOP)</label>
+              <input type="number" step="0.5" min="0" max="31" id="single-absent-days" class="form-control" value="0" required />
+            </div>
+          </div>
+
+          <!-- Live Calculation Preview Card -->
+          <div class="calc-preview-card">
+            <div class="calc-preview-row">
+              <span>Base Monthly Salary:</span>
+              <strong id="preview-base-salary">₹0.00</strong>
+            </div>
+            <div class="calc-preview-row">
+              <span>Total Cycle Days (Present + Casual + Absent):</span>
+              <span id="preview-total-days">0 days</span>
+            </div>
+            <div class="calc-preview-row">
+              <span>Total Paid Days (Present + Casual):</span>
+              <strong id="preview-paid-days" style="color: var(--accent);">0 days</strong>
+            </div>
+            <div class="calc-preview-row">
+              <span>Daily Rate:</span>
+              <span id="preview-daily-rate">₹0.00</span>
+            </div>
+            <div class="calc-preview-row">
+              <span>Loss of Pay Deduction (Absent Days × Daily Rate):</span>
+              <strong id="preview-loss-of-pay" style="color: var(--danger);">-₹0.00</strong>
+            </div>
+            <div class="calc-preview-row calc-preview-total">
+              <span>Calculated Net Salary:</span>
+              <strong id="preview-net-salary">₹0.00</strong>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">Save Salary Entry</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: CENTRAL SALARY SHEET                -->
+    <!-- ========================================== -->
+    <section id="salary-sheet-tab" class="tab-pane">
+      <!-- Top Metrics Row -->
+      <div class="metrics-row">
+        <div class="metric-card">
+          <span class="metric-label">Total Net Disbursed</span>
+          <span class="metric-value" id="sheet-total-net" style="color: var(--success);">₹0.00</span>
+          <span class="metric-sub">Final take-home payable</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Total Base Payroll</span>
+          <span class="metric-value" id="sheet-total-base">₹0.00</span>
+          <span class="metric-sub">Full contract baseline</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Total Loss of Pay</span>
+          <span class="metric-value" id="sheet-total-lop" style="color: var(--danger);">-₹0.00</span>
+          <span class="metric-sub">Absent deductions</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Active Staff</span>
+          <span class="metric-value" id="sheet-total-emps">0 Staff</span>
+          <span class="metric-sub">Processed in sheet</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="company-heading">STIFLINK MANAGEMENT (OPC) PVT. LTD</div>
+            <div class="company-sub-address">OFFICE NO. 301 FIFTH FLOOR, ADHARHSILA COMPLEX, GANDHI MAIDAN, PATNA, BIHAR 800001.</div>
+            <h2 id="sheet-display-title" style="margin-top: 0.4rem;">Central Salary Sheet</h2>
+            <p>Master Monthly Payroll Register showing all staff, days breakdown, deductions, and net disbursements.</p>
+          </div>
+          <div style="display: flex; gap: 0.6rem; align-items: center;" class="no-print">
+            <input type="text" id="sheet-month-input" class="form-control" placeholder="Month Name" style="width: 160px;" />
+            <select id="sheet-month-select" class="form-control" style="width: 170px;">
+              <option value="">-- Or Pick Saved --</option>
+            </select>
+            <button id="sheet-load-btn" class="btn btn-secondary">Filter</button>
+            <button id="sheet-export-csv-btn" class="btn btn-success">📊 Export Excel/CSV</button>
+            <button id="sheet-print-btn" class="btn btn-primary">🖨️ Print Sheet</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="sheet-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Emp ID</th>
+                <th>Employee Name</th>
+                <th>Base Salary</th>
+                <th style="text-align: center;">Present</th>
+                <th style="text-align: center;">Casual (Paid)</th>
+                <th style="text-align: center;">Absent (LOP)</th>
+                <th style="text-align: center;">Paid Days</th>
+                <th>Daily Rate</th>
+                <th>Loss of Pay</th>
+                <th>Net Salary</th>
+                <th class="no-print" style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="sheet-tbody">
+              <!-- Rendered by salary-sheet.js -->
+            </tbody>
+            <tfoot id="sheet-tfoot">
+              <!-- Grand totals rendered by salary-sheet.js -->
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: INDIVIDUAL PAYSLIP                  -->
+    <!-- ========================================== -->
+    <section id="payslip-tab" class="tab-pane">
+      <div class="card no-print" style="max-width: 800px; margin: 0 auto 1.5rem auto;">
+        <div class="card-header">
+          <div>
+            <h2>Generate Salary Slip</h2>
+            <p>Select Month and Employee to view and print the individual payslip.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: flex-end;">
+          <div class="form-group" style="flex: 1; min-width: 150px;">
+            <label>Month Name</label>
+            <input type="text" id="slip-month-input" class="form-control" placeholder="e.g. October 2026" />
+          </div>
+          <div class="form-group" style="width: 160px;">
+            <label>Saved Months</label>
+            <select id="slip-month-select" class="form-control">
+              <option value="">-- Pick --</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 2; min-width: 200px;">
+            <label>Select Employee</label>
+            <select id="slip-emp-select" class="form-control">
+              <option value="">-- Choose Employee --</option>
+            </select>
+          </div>
+          <button id="slip-load-btn" class="btn btn-secondary">View Slip</button>
+          <button id="slip-print-btn" class="btn btn-primary">🖨️ Print / PDF</button>
+        </div>
+      </div>
+
+      <!-- Printable Payslip Document -->
+      <div id="payslip-display-area" class="payslip-container" style="display: none;">
+        <div class="payslip-header">
+          <h2>STIFLINK MANAGEMENT (OPC) PVT. LTD</h2>
+          <div class="company-address">OFFICE NO. 301 FIFTH FLOOR, ADHARHSILA COMPLEX, GANDHI MAIDAN, PATNA, BIHAR 800001.</div>
+          <h3>PAYSLIP FOR THE MONTH OF <span id="slip-out-month">October 2026</span></h3>
+        </div>
+
+        <div class="payslip-meta">
+          <div class="meta-item">
+            <span class="meta-label">Employee Name:</span>
+            <span id="slip-out-name">John Doe</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Employee ID:</span>
+            <span id="slip-out-id" style="font-weight: 700;">EMP001</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Designation:</span>
+            <span id="slip-out-desig">Senior Accountant</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Payment Mode:</span>
+            <span>Bank Transfer</span>
+          </div>
+        </div>
+
+        <div class="payslip-box" style="margin-bottom: 1.5rem;">
+          <div class="payslip-box-title">Monthly Attendance Summary</div>
+          <div style="display: grid; grid-template-columns: repeat(5, 1fr); padding: 0.75rem 1rem; text-align: center; font-size: 0.85rem;">
+            <div>
+              <div style="color: var(--text-muted); font-size: 0.75rem;">Total Days</div>
+              <strong id="slip-out-total">30 days</strong>
+            </div>
+            <div>
+              <div style="color: var(--text-muted); font-size: 0.75rem;">Present Days</div>
+              <strong id="slip-out-present" style="color: var(--success);">26 days</strong>
+            </div>
+            <div>
+              <div style="color: var(--text-muted); font-size: 0.75rem;">Casual Leave</div>
+              <strong id="slip-out-casual" style="color: var(--accent);">2 days</strong>
+            </div>
+            <div>
+              <div style="color: var(--text-muted); font-size: 0.75rem;">Absent (LOP)</div>
+              <strong id="slip-out-absent" style="color: var(--danger);">2 days</strong>
+            </div>
+            <div>
+              <div style="color: var(--text-muted); font-size: 0.75rem;">Payable Days</div>
+              <strong id="slip-out-paid" style="font-size: 1rem; color: var(--primary);">28 days</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="payslip-columns">
+          <!-- Earnings Column -->
+          <div class="payslip-box">
+            <div class="payslip-box-title">Earnings Breakdown</div>
+            <div class="payslip-row">
+              <span>Basic &amp; Allowances:</span>
+              <strong id="slip-out-base">₹0.00</strong>
+            </div>
+          </div>
+
+          <!-- Deductions Column -->
+          <div class="payslip-box">
+            <div class="payslip-box-title">Deductions Breakdown</div>
+            <div class="payslip-row">
+              <span>Loss of Pay (Absent Days):</span>
+              <strong id="slip-out-lop" style="color: var(--danger);">-₹0.00</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Net Amount Highlight Box -->
+        <div class="payslip-net-box">
+          <div>
+            <div class="net-label">NET SALARY PAYABLE:</div>
+            <div class="net-words" id="slip-out-words">Fifty Thousand Rupees Only</div>
+          </div>
+          <div class="net-amount" id="slip-out-net">₹0.00</div>
+        </div>
+
+        <div class="payslip-signatures">
+          <div class="signature-line">
+            For STIFLINK MANAGEMENT (OPC) PVT. LTD<br />
+            <strong>Authorized Signatory / Accountant</strong>
+          </div>
+          <div class="signature-line">
+            <strong>Employee Signature</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: MANAGE EMPLOYEES                    -->
+    <!-- ========================================== -->
+    <section id="employees-tab" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Add New Employee</h2>
+            <p>Register a new staff member with their monthly base salary.</p>
+          </div>
+        </div>
+
+        <form id="add-employee-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="emp-name">Full Name *</label>
+              <input type="text" id="emp-name" class="form-control" placeholder="e.g. Jane Smith" required />
+            </div>
+
+            <div class="form-group">
+              <label for="emp-designation">Designation / Role</label>
+              <input type="text" id="emp-designation" class="form-control" placeholder="e.g. Senior Auditor" />
+            </div>
+
+            <div class="form-group">
+              <label for="emp-base-salary">Monthly Base Salary (₹) *</label>
+              <input type="number" step="100" min="0" id="emp-base-salary" class="form-control" placeholder="e.g. 55000" required />
+            </div>
+
+            <div class="form-group">
+              <label for="emp-id">Employee ID (Optional)</label>
+              <input type="text" id="emp-id" class="form-control" placeholder="Auto-generated if blank (e.g. EMP005)" />
+            </div>
+          </div>
+
+          <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary">+ Add Employee</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Employee Master Directory (<span id="emp-total-count">0</span>)</h2>
+            <p>Active employees available for monthly salary calculations.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp ID</th>
+                <th>Full Name</th>
+                <th>Designation</th>
+                <th>Monthly Base Salary</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="employees-tbody">
+              <!-- Dynamically populated by employees.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/api.js"></script>
+  <script src="js/employees.js"></script>
+  <script src="js/payroll-single.js"></script>
+  <script src="js/payroll-bulk.js"></script>
+  <script src="js/salary-sheet.js"></script>
+  <script src="js/payslip.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+

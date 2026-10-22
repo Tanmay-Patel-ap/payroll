@@ -1,0 +1,12 @@
+# Compiled binaries and build artifacts
+*.exe
+*.obj
+*.o
+*.pdb
+server/build/
+
+# Operating system / IDE files
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

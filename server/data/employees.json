@@ -1,0 +1,32 @@
+[
+  {
+    "baseSalary":  65000,
+    "designation":  "Senior Accountant",
+    "name":  "John Doe",
+    "id":  "EMP001"
+  },
+  {
+    "baseSalary":  85000,
+    "designation":  "Finance Manager",
+    "name":  "Sarah Smith",
+    "id":  "EMP002"
+  },
+  {
+    "baseSalary":  42000,
+    "designation":  "Junior Auditor",
+    "name":  "David Miller",
+    "id":  "EMP003"
+  },
+  {
+    "baseSalary":  50000,
+    "designation":  "Payroll Specialist",
+    "name":  "Emma Watson",
+    "id":  "EMP004"
+  },
+  {
+    "baseSalary":  75000,
+    "designation":  "Tax Consultant",
+    "name":  "Robert Brown",
+    "id":  "EMP006"
+  }
+]
