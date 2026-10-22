@@ -5,6 +5,10 @@
 *.pdb
 server/build/
 
+# Temporary Excel lock files
+~$*
+~$*.xlsx
+
 # Operating system / IDE files
 .vscode/
 .idea/
