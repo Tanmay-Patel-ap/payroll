@@ -5,9 +5,17 @@ echo ======================================================
 
 cd /d "%~dp0server"
 
-g++ -std=c++17 -Iinclude -O2 src/main.cpp src/server.cpp src/models/*.cpp src/repositories/*.cpp src/services/*.cpp src/utils/*.cpp -o payroll_server.exe -lws2_32
+taskkill /f /im payroll_server.exe 2>nul
 
-if %ERRORLEVEL% equ 0 (
+echo Compiling source files...
+g++ -std=c++17 -Iinclude -c src/main.cpp src/models/*.cpp src/repositories/*.cpp src/services/*.cpp src/utils/*.cpp
+g++ -std=c++17 -Iinclude -c src/server.cpp -o server.o
+
+echo Linking payroll_server.exe...
+g++ *.o -o payroll_server.exe -lws2_32
+del /f /q *.o 2>nul
+
+if exist "payroll_server.exe" (
     echo.
     echo [SUCCESS] server\payroll_server.exe compiled successfully!
 ) else (

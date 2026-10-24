@@ -3,7 +3,7 @@
  */
 class App {
   constructor() {
-    this.currentTab = 'bulk-tab';
+    this.currentTab = 'salary-sheet-tab';
     this.toastContainer = document.getElementById('toast-container');
     this.initTabs();
   }
@@ -81,33 +81,44 @@ class App {
   }
 }
 
+function initFinancialYearSelects() {
+  const years = PayrollUtils.getDynamicFinancialYears(2026);
+  const selectIds = ['sheet-fy-select', 'slip-fy-select'];
+  selectIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const prev = el.value;
+    el.innerHTML = '';
+    years.forEach((fy) => {
+      const opt = document.createElement('option');
+      opt.value = fy;
+      opt.textContent = `FY ${fy}`;
+      el.appendChild(opt);
+    });
+    if (years.includes(prev)) {
+      el.value = prev;
+    } else {
+      el.value = '2026-27';
+    }
+  });
+}
+
 // Global bootstrap
 document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize dynamic financial year dropdowns (starting 2026-27 onwards)
+  initFinancialYearSelects();
+
   window.app = new App();
+  window.roleManager = new RoleManager(window.apiClient);
   window.employeeManager = new EmployeeManager(window.apiClient);
-  window.singlePayrollEntry = new SinglePayrollEntry(window.apiClient);
-  window.bulkPayrollEntry = new BulkPayrollEntry(window.apiClient);
   window.salarySheetManager = new SalarySheetManager(window.apiClient);
   window.payslipViewer = new PayslipViewer(window.apiClient);
 
-  // Load initial employees and recorded months
+  // Load initial employees
   await window.employeeManager.loadEmployees();
-  await window.salarySheetManager.refreshMonthsList();
-  await window.payslipViewer.refreshMonthsList();
-
-  // If there's an active month, initialize inputs
-  const defaultMonth = "October 2026";
-  const m1 = document.getElementById('bulk-month');
-  const m2 = document.getElementById('single-month');
-  const m3 = document.getElementById('sheet-month-input');
-  const m4 = document.getElementById('slip-month-input');
-
-  if (m1) m1.value = defaultMonth;
-  if (m2) m2.value = defaultMonth;
-  if (m3) m3.value = defaultMonth;
-  if (m4) m4.value = defaultMonth;
 
   // Pre-load sheet for default month
-  window.salarySheetManager.loadSheet(defaultMonth);
+  const defaultMonth = "October 2026";
+  window.salarySheetManager.setMonth(defaultMonth);
 });
 

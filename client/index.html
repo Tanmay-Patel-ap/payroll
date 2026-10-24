@@ -4,29 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>STIFLINK MANAGEMENT (OPC) PVT. LTD - Payroll &amp; Payslips</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=11" />
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
-  <header class="app-header">
+  <!-- Top Company Branding Header -->
+  <div class="company-brand-header">
     <div class="brand">
       <div class="brand-icon">₹</div>
       <div class="brand-title">
         <h1>STIFLINK MANAGEMENT (OPC) PVT. LTD</h1>
-        <span style="font-size: 0.7rem; text-transform: none; letter-spacing: normal;">OFFICE NO. 301 FIFTH FLOOR, ADHARHSILA COMPLEX, GANDHI MAIDAN, PATNA, BIHAR 800001</span>
+        <span class="company-address-text">OFFICE NO. 301 FIFTH FLOOR, ADHARHSILA COMPLEX, GANDHI MAIDAN, PATNA, BIHAR 800001</span>
       </div>
     </div>
+  </div>
 
+  <!-- Separate Navigation Bar -->
+  <div class="app-nav-bar">
     <nav class="main-nav">
-      <button class="active" data-tab="bulk-tab">
-        <span>📊</span> Tabular Entry (Bulk)
-      </button>
-      <button data-tab="single-tab">
-        <span>📝</span> Single Entry (Form)
-      </button>
-      <button data-tab="salary-sheet-tab">
-        <span>📋</span> Central Salary Sheet
+      <button class="active" data-tab="salary-sheet-tab">
+        <span>📋</span> SALARY SHEET
       </button>
       <button data-tab="payslip-tab">
         <span>🧾</span> Individual Payslip
@@ -34,198 +31,93 @@
       <button data-tab="employees-tab">
         <span>👥</span> Manage Employees
       </button>
+      <button data-tab="roles-tab">
+        <span>💼</span> Role Management
+      </button>
     </nav>
-
-    <div class="server-status">
-      <span class="status-dot"></span>
-      <span>C++ Server Active</span>
-    </div>
-  </header>
+  </div>
 
   <!-- Main Workspace Container -->
   <main class="container">
 
     <!-- ========================================== -->
-    <!-- TAB 1: TABULAR ENTRY (BULK SPREADSHEET MODE)-->
+    <!-- TAB 1: SALARY SHEET                        -->
     <!-- ========================================== -->
-    <section id="bulk-tab" class="tab-pane active">
+    <section id="salary-sheet-tab" class="tab-pane active">
       <div class="card">
         <div class="card-header">
           <div>
-            <h2>Multiple Tabular Payroll Entry (Spreadsheet Mode)</h2>
-            <p>Quickly enter Present Days, Casual Leaves, and Absent Days for all employees and save in one click.</p>
+            <h2 id="sheet-display-title" style="margin-top: 0.4rem;">SALARY SHEET</h2>
           </div>
-          <div style="display: flex; gap: 0.6rem; align-items: center;">
-            <input type="text" id="bulk-month" class="form-control" placeholder="e.g. October 2026" style="width: 170px;" />
-            <button id="bulk-load-btn" class="btn btn-secondary">Load Saved</button>
-            <button id="bulk-quick-fill-btn" class="btn btn-secondary" title="Fill all employees with default days">Quick Fill</button>
-            <button id="bulk-save-all-btn" class="btn btn-success">Save All Entries</button>
-          </div>
-        </div>
-
-        <div class="table-responsive">
-          <table class="data-table" id="bulk-table">
-            <thead>
-              <tr>
-                <th>Emp ID</th>
-                <th>Employee Name</th>
-                <th>Base Salary</th>
-                <th>Present Days</th>
-                <th>Casual Leave (Paid)</th>
-                <th>Absent Days (LOP)</th>
-                <th>Paid Days</th>
-                <th>Loss of Pay</th>
-                <th>Net Salary</th>
-              </tr>
-            </thead>
-            <tbody id="bulk-table-tbody">
-              <!-- Dynamically populated by payroll-bulk.js -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- TAB 2: SINGLE ENTRY FORM                   -->
-    <!-- ========================================== -->
-    <section id="single-tab" class="tab-pane">
-      <div class="card" style="max-width: 750px; margin: 0 auto;">
-        <div class="card-header">
-          <div>
-            <h2>Single Employee Payroll Entry</h2>
-            <p>Select an individual employee to enter days and preview instant salary calculation.</p>
-          </div>
-        </div>
-
-        <form id="single-entry-form">
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="single-month">Month Name *</label>
-              <input type="text" id="single-month" class="form-control" placeholder="e.g. October 2026" required />
-            </div>
-
-            <div class="form-group" style="grid-column: span 2;">
-              <label for="single-emp-select">Select Employee *</label>
-              <select id="single-emp-select" class="form-control" required>
-                <option value="">-- Choose Employee --</option>
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;" class="no-print">
+            <div style="display: flex; gap: 0.35rem; align-items: center;">
+              <select id="sheet-fy-select" class="form-control" style="width: 125px; font-weight: 600;" title="Financial Year">
+                <option value="2026-27" selected>FY 2026-27</option>
+                <option value="2027-28">FY 2027-28</option>
+              </select>
+              <select id="sheet-month-select" class="form-control" style="width: 135px; font-weight: 600;" title="Month in Financial Year">
+                <option value="April">April</option>
+                <option value="May">May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October" selected>October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
+                <option value="January">January</option>
+                <option value="February">February</option>
+                <option value="March">March</option>
               </select>
             </div>
+            <input type="text" id="sheet-search-input" class="form-control" placeholder="🔍 Search staff..." style="width: 150px;" />
+            <button id="sheet-save-btn" class="btn btn-success" title="Save all entries to database and sync to Excel">💾 Save Sheet</button>
 
-            <div class="form-group">
-              <label for="single-present-days">Present Days</label>
-              <input type="number" step="0.5" min="0" max="31" id="single-present-days" class="form-control" value="26" required />
+            <!-- Column Visibility Dropdown for Central Sheet -->
+            <div class="col-dropdown-wrapper" id="sheet-col-dropdown">
+              <button type="button" class="btn btn-secondary" id="sheet-col-btn" title="Choose which columns to show or hide">
+                <span>⚙️ Columns</span> ▾
+              </button>
+              <div class="col-dropdown-menu" id="sheet-col-menu" style="display: none;">
+                <div class="col-menu-header">
+                  <span>Show / Hide Columns</span>
+                  <div class="col-menu-actions">
+                    <button type="button" class="btn-link-xs" id="sheet-col-all">All</button>
+                    <button type="button" class="btn-link-xs" id="sheet-col-reset">Reset</button>
+                  </div>
+                </div>
+                <div class="col-menu-list" id="sheet-col-list">
+                  <!-- Populated dynamically by salary-sheet.js -->
+                </div>
+              </div>
             </div>
-
-            <div class="form-group">
-              <label for="single-casual-days">Casual Leave Days (Paid)</label>
-              <input type="number" step="0.5" min="0" max="31" id="single-casual-days" class="form-control" value="0" required />
-            </div>
-
-            <div class="form-group">
-              <label for="single-absent-days">Absent Days (Unpaid / LOP)</label>
-              <input type="number" step="0.5" min="0" max="31" id="single-absent-days" class="form-control" value="0" required />
-            </div>
-          </div>
-
-          <!-- Live Calculation Preview Card -->
-          <div class="calc-preview-card">
-            <div class="calc-preview-row">
-              <span>Base Monthly Salary:</span>
-              <strong id="preview-base-salary">₹0.00</strong>
-            </div>
-            <div class="calc-preview-row">
-              <span>Total Cycle Days (Present + Casual + Absent):</span>
-              <span id="preview-total-days">0 days</span>
-            </div>
-            <div class="calc-preview-row">
-              <span>Total Paid Days (Present + Casual):</span>
-              <strong id="preview-paid-days" style="color: var(--accent);">0 days</strong>
-            </div>
-            <div class="calc-preview-row">
-              <span>Daily Rate:</span>
-              <span id="preview-daily-rate">₹0.00</span>
-            </div>
-            <div class="calc-preview-row">
-              <span>Loss of Pay Deduction (Absent Days × Daily Rate):</span>
-              <strong id="preview-loss-of-pay" style="color: var(--danger);">-₹0.00</strong>
-            </div>
-            <div class="calc-preview-row calc-preview-total">
-              <span>Calculated Net Salary:</span>
-              <strong id="preview-net-salary">₹0.00</strong>
-            </div>
-          </div>
-
-          <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
-            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">Save Salary Entry</button>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- TAB 3: CENTRAL SALARY SHEET                -->
-    <!-- ========================================== -->
-    <section id="salary-sheet-tab" class="tab-pane">
-      <!-- Top Metrics Row -->
-      <div class="metrics-row">
-        <div class="metric-card">
-          <span class="metric-label">Total Net Disbursed</span>
-          <span class="metric-value" id="sheet-total-net" style="color: var(--success);">₹0.00</span>
-          <span class="metric-sub">Final take-home payable</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-label">Total Base Payroll</span>
-          <span class="metric-value" id="sheet-total-base">₹0.00</span>
-          <span class="metric-sub">Full contract baseline</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-label">Total Loss of Pay</span>
-          <span class="metric-value" id="sheet-total-lop" style="color: var(--danger);">-₹0.00</span>
-          <span class="metric-sub">Absent deductions</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-label">Active Staff</span>
-          <span class="metric-value" id="sheet-total-emps">0 Staff</span>
-          <span class="metric-sub">Processed in sheet</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="company-heading">STIFLINK MANAGEMENT (OPC) PVT. LTD</div>
-            <div class="company-sub-address">OFFICE NO. 301 FIFTH FLOOR, ADHARHSILA COMPLEX, GANDHI MAIDAN, PATNA, BIHAR 800001.</div>
-            <h2 id="sheet-display-title" style="margin-top: 0.4rem;">Central Salary Sheet</h2>
-            <p>Master Monthly Payroll Register showing all staff, days breakdown, deductions, and net disbursements.</p>
-          </div>
-          <div style="display: flex; gap: 0.6rem; align-items: center;" class="no-print">
-            <input type="text" id="sheet-month-input" class="form-control" placeholder="Month Name" style="width: 160px;" />
-            <select id="sheet-month-select" class="form-control" style="width: 170px;">
-              <option value="">-- Or Pick Saved --</option>
-            </select>
-            <button id="sheet-load-btn" class="btn btn-secondary">Filter</button>
-            <button id="sheet-export-csv-btn" class="btn btn-success">📊 Export Excel/CSV</button>
-            <button id="sheet-print-btn" class="btn btn-primary">🖨️ Print Sheet</button>
           </div>
         </div>
 
         <div class="table-responsive">
-          <table class="data-table" id="sheet-table">
+          <table class="data-table table-compact" id="sheet-table">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Emp ID</th>
-                <th>Employee Name</th>
-                <th>Base Salary</th>
-                <th style="text-align: center;">Present</th>
-                <th style="text-align: center;">Casual (Paid)</th>
-                <th style="text-align: center;">Absent (LOP)</th>
-                <th style="text-align: center;">Paid Days</th>
-                <th>Daily Rate</th>
-                <th>Loss of Pay</th>
-                <th>Net Salary</th>
-                <th class="no-print" style="text-align: right;">Action</th>
+                <th class="sortable" data-sort="status" data-col="index" style="width: 58px; text-align: center;" title="Sort by Attendance Status">Status / #</th>
+                <th class="sortable" data-sort="employeeId" data-col="id">Emp ID</th>
+                <th class="sortable" data-sort="employeeName" data-col="name">Employee Name</th>
+                <th class="sortable" data-sort="designation" data-col="desig">Designation</th>
+                <th class="sortable" data-sort="bankName" data-col="bankName">Bank Name</th>
+                <th class="sortable" data-sort="bankAccountNo" data-col="bankAccount">Bank A/C No</th>
+                <th class="sortable" data-sort="bankIfscCode" data-col="bankIfsc">IFSC Code</th>
+                <th class="sortable" data-sort="panTaxNo" data-col="pan">PAN Number</th>
+                <th class="sortable" data-sort="monthlySalary" data-col="salary">Monthly Base</th>
+                <th class="sortable" data-sort="presentDays" data-col="present" style="background: #eef2ff;">Present</th>
+                <th class="sortable" data-sort="casualLeaveDays" data-col="casual" style="background: #eef2ff;">Casual</th>
+                <th class="sortable" data-sort="absentDays" data-col="absent" style="background: #eef2ff;">Absent</th>
+                <th class="sortable" data-sort="sundays" data-col="sundays" style="text-align: center;">Sundays</th>
+                <th class="sortable" data-sort="paidDays" data-col="paid" style="text-align: center;">Paid Days</th>
+                <th class="sortable" data-sort="totalDays" data-col="totalDays" style="text-align: center;">Total Days</th>
+                <th class="sortable" data-sort="grossSalary" data-col="gross">Gross Salary</th>
+                <th class="sortable" data-sort="advanceDeducted" data-col="advance" style="background: #fee2e2;">Advance</th>
+                <th class="sortable" data-sort="netSalary" data-col="net">Net Salary</th>
+                <th data-col="remarks" style="background: #eef2ff;">Remarks</th>
+                <th class="no-print" data-col="action" style="text-align: center; min-width: 175px;">Slip Actions</th>
               </tr>
             </thead>
             <tbody id="sheet-tbody">
@@ -247,28 +139,41 @@
         <div class="card-header">
           <div>
             <h2>Generate Salary Slip</h2>
-            <p>Select Month and Employee to view and print the individual payslip.</p>
           </div>
         </div>
         <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: flex-end;">
-          <div class="form-group" style="flex: 1; min-width: 150px;">
-            <label>Month Name</label>
-            <input type="text" id="slip-month-input" class="form-control" placeholder="e.g. October 2026" />
+          <div class="form-group" style="width: 140px;">
+            <label for="slip-fy-select">Financial Year</label>
+            <select id="slip-fy-select" class="form-control" style="font-weight: 600;">
+              <option value="2026-27" selected>FY 2026-27</option>
+              <option value="2027-28">FY 2027-28</option>
+            </select>
           </div>
-          <div class="form-group" style="width: 160px;">
-            <label>Saved Months</label>
-            <select id="slip-month-select" class="form-control">
-              <option value="">-- Pick --</option>
+          <div class="form-group" style="width: 150px;">
+            <label for="slip-month-select">Salary Month</label>
+            <select id="slip-month-select" class="form-control" style="font-weight: 600;">
+              <option value="April">April</option>
+              <option value="May">May</option>
+              <option value="June">June</option>
+              <option value="July">July</option>
+              <option value="August">August</option>
+              <option value="September">September</option>
+              <option value="October" selected>October</option>
+              <option value="November">November</option>
+              <option value="December">December</option>
+              <option value="January">January</option>
+              <option value="February">February</option>
+              <option value="March">March</option>
             </select>
           </div>
           <div class="form-group" style="flex: 2; min-width: 200px;">
-            <label>Select Employee</label>
+            <label for="slip-emp-select">Select Employee</label>
             <select id="slip-emp-select" class="form-control">
               <option value="">-- Choose Employee --</option>
             </select>
           </div>
           <button id="slip-load-btn" class="btn btn-secondary">View Slip</button>
-          <button id="slip-print-btn" class="btn btn-primary">🖨️ Print / PDF</button>
+          <button id="slip-save-btn" class="btn btn-success" title="Save PDF to designated folder & download">💾 Save Slip</button>
         </div>
       </div>
 
@@ -280,28 +185,54 @@
           <h3>PAYSLIP FOR THE MONTH OF <span id="slip-out-month">October 2026</span></h3>
         </div>
 
-        <div class="payslip-meta">
-          <div class="meta-item">
-            <span class="meta-label">Employee Name:</span>
-            <span id="slip-out-name">John Doe</span>
-          </div>
+        <!-- Employee & Bank Meta Grid -->
+        <div class="payslip-meta-grid-4">
           <div class="meta-item">
             <span class="meta-label">Employee ID:</span>
-            <span id="slip-out-id" style="font-weight: 700;">EMP001</span>
+            <strong id="slip-out-id" style="color: var(--primary);">EMP001</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Employee Name:</span>
+            <strong id="slip-out-name">John Doe</strong>
           </div>
           <div class="meta-item">
             <span class="meta-label">Designation:</span>
             <span id="slip-out-desig">Senior Accountant</span>
           </div>
           <div class="meta-item">
+            <span class="meta-label">Monthly Base Salary:</span>
+            <strong id="slip-out-salary" style="color: var(--primary);">₹0.00</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Bank Name:</span>
+            <span id="slip-out-bank">State Bank of India</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Bank A/C No:</span>
+            <span id="slip-out-account">30981245678</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Bank IFSC:</span>
+            <span id="slip-out-ifsc">SBIN0001234</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">PAN Number:</span>
+            <span id="slip-out-pan">ABCDE1234F</span>
+          </div>
+          <div class="meta-item">
             <span class="meta-label">Payment Mode:</span>
             <span>Bank Transfer</span>
           </div>
+          <div class="meta-item">
+            <span class="meta-label">Date of Joining:</span>
+            <span id="slip-out-doj">2024-04-01</span>
+          </div>
         </div>
 
+        <!-- Attendance Summary -->
         <div class="payslip-box" style="margin-bottom: 1.5rem;">
           <div class="payslip-box-title">Monthly Attendance Summary</div>
-          <div style="display: grid; grid-template-columns: repeat(5, 1fr); padding: 0.75rem 1rem; text-align: center; font-size: 0.85rem;">
+          <div style="display: grid; grid-template-columns: repeat(6, 1fr); padding: 0.75rem 1rem; text-align: center; font-size: 0.85rem;">
             <div>
               <div style="color: var(--text-muted); font-size: 0.75rem;">Total Days</div>
               <strong id="slip-out-total">30 days</strong>
@@ -312,46 +243,44 @@
             </div>
             <div>
               <div style="color: var(--text-muted); font-size: 0.75rem;">Casual Leave</div>
-              <strong id="slip-out-casual" style="color: var(--accent);">2 days</strong>
+              <strong id="slip-out-casual" style="color: var(--accent);">0 days</strong>
             </div>
             <div>
-              <div style="color: var(--text-muted); font-size: 0.75rem;">Absent (LOP)</div>
-              <strong id="slip-out-absent" style="color: var(--danger);">2 days</strong>
+              <div style="color: var(--text-muted); font-size: 0.75rem;">Absent Days</div>
+              <strong id="slip-out-absent" style="color: var(--danger);">0 days</strong>
+            </div>
+            <div>
+              <div style="color: var(--text-muted); font-size: 0.75rem;">Sundays</div>
+              <strong id="slip-out-sundays" style="color: var(--primary);">4 days</strong>
             </div>
             <div>
               <div style="color: var(--text-muted); font-size: 0.75rem;">Payable Days</div>
-              <strong id="slip-out-paid" style="font-size: 1rem; color: var(--primary);">28 days</strong>
+              <strong id="slip-out-paid" style="font-size: 1rem; color: var(--primary);">30 days</strong>
             </div>
           </div>
         </div>
 
-        <div class="payslip-columns">
-          <!-- Earnings Column -->
-          <div class="payslip-box">
-            <div class="payslip-box-title">Earnings Breakdown</div>
-            <div class="payslip-row">
-              <span>Basic &amp; Allowances:</span>
-              <strong id="slip-out-base">₹0.00</strong>
-            </div>
+        <!-- Simplified Salary Computation (Gross Salary -> Advance Deduction -> Net Salary) -->
+        <div class="payslip-box" style="margin-bottom: 1.5rem;">
+          <div class="payslip-row" style="padding: 0.85rem 1.25rem; font-size: 0.95rem; border-bottom: 1px solid var(--border);">
+            <span style="font-weight: 600; color: var(--text-primary);">Gross Salary</span>
+            <strong id="slip-out-gross" style="font-size: 1.05rem; color: var(--primary);">₹0.00</strong>
           </div>
-
-          <!-- Deductions Column -->
-          <div class="payslip-box">
-            <div class="payslip-box-title">Deductions Breakdown</div>
-            <div class="payslip-row">
-              <span>Loss of Pay (Absent Days):</span>
-              <strong id="slip-out-lop" style="color: var(--danger);">-₹0.00</strong>
+          <div class="payslip-row" style="padding: 0.85rem 1.25rem; font-size: 0.95rem; border-bottom: 1px solid var(--border);">
+            <span style="font-weight: 600; color: var(--text-primary);">Advance Deduction</span>
+            <strong id="slip-out-advance" style="font-size: 1.05rem; color: var(--danger);">-₹0.00</strong>
+          </div>
+          <div class="payslip-net-box" style="margin: 0; border: none; border-top: 2px solid #0284c7; border-radius: 0; padding: 1.1rem 1.25rem;">
+            <div>
+              <div class="net-label" style="font-size: 0.95rem; font-weight: 700; color: var(--primary);">NET SALARY:</div>
+              <div class="net-words" id="slip-out-words" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; font-style: italic;">Zero Rupees Only</div>
             </div>
+            <div class="net-amount" id="slip-out-net" style="font-size: 1.55rem; font-weight: 800; color: var(--primary);">₹0.00</div>
           </div>
         </div>
 
-        <!-- Net Amount Highlight Box -->
-        <div class="payslip-net-box">
-          <div>
-            <div class="net-label">NET SALARY PAYABLE:</div>
-            <div class="net-words" id="slip-out-words">Fifty Thousand Rupees Only</div>
-          </div>
-          <div class="net-amount" id="slip-out-net">₹0.00</div>
+        <div id="slip-out-remarks-box" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem; font-style: italic; display: none;">
+          <strong>Remarks:</strong> <span id="slip-out-remarks"></span>
         </div>
 
         <div class="payslip-signatures">
@@ -373,57 +302,49 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <h2>Add New Employee</h2>
-            <p>Register a new staff member with their monthly base salary.</p>
+            <h2>Employee Master Directory (<span id="emp-total-count">0</span> Staff)</h2>
           </div>
-        </div>
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="emp-search-input" class="form-control" placeholder="🔍 Search by ID, Name, Role..." style="width: 230px;" />
+            <button type="button" id="open-add-emp-btn" class="btn btn-primary" style="white-space: nowrap;">+ Add Employee</button>
 
-        <form id="add-employee-form">
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="emp-name">Full Name *</label>
-              <input type="text" id="emp-name" class="form-control" placeholder="e.g. Jane Smith" required />
+            <!-- Column Visibility Dropdown for Employee Table -->
+            <div class="col-dropdown-wrapper" id="emp-col-dropdown">
+              <button type="button" class="btn btn-secondary" id="emp-col-btn" title="Choose which columns to show or hide">
+                <span>⚙️ Columns</span> ▾
+              </button>
+              <div class="col-dropdown-menu" id="emp-col-menu" style="display: none;">
+                <div class="col-menu-header">
+                  <span>Show / Hide Columns</span>
+                  <div class="col-menu-actions">
+                    <button type="button" class="btn-link-xs" id="emp-col-all">All</button>
+                    <button type="button" class="btn-link-xs" id="emp-col-reset">Reset</button>
+                  </div>
+                </div>
+                <div class="col-menu-list" id="emp-col-list">
+                  <!-- Populated dynamically by employees.js -->
+                </div>
+              </div>
             </div>
-
-            <div class="form-group">
-              <label for="emp-designation">Designation / Role</label>
-              <input type="text" id="emp-designation" class="form-control" placeholder="e.g. Senior Auditor" />
-            </div>
-
-            <div class="form-group">
-              <label for="emp-base-salary">Monthly Base Salary (₹) *</label>
-              <input type="number" step="100" min="0" id="emp-base-salary" class="form-control" placeholder="e.g. 55000" required />
-            </div>
-
-            <div class="form-group">
-              <label for="emp-id">Employee ID (Optional)</label>
-              <input type="text" id="emp-id" class="form-control" placeholder="Auto-generated if blank (e.g. EMP005)" />
-            </div>
-          </div>
-
-          <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end;">
-            <button type="submit" class="btn btn-primary">+ Add Employee</button>
-          </div>
-        </form>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h2>Employee Master Directory (<span id="emp-total-count">0</span>)</h2>
-            <p>Active employees available for monthly salary calculations.</p>
           </div>
         </div>
 
         <div class="table-responsive">
-          <table class="data-table">
+          <table class="data-table" id="employees-table">
             <thead>
               <tr>
-                <th>Emp ID</th>
-                <th>Full Name</th>
-                <th>Designation</th>
-                <th>Monthly Base Salary</th>
-                <th style="text-align: right;">Action</th>
+                <th class="sortable" data-sort="id" data-col="id" title="Click to view card or sort by ID">Emp ID</th>
+                <th class="sortable" data-sort="name" data-col="name">Full Name</th>
+                <th class="sortable" data-sort="designation" data-col="desig">Designation</th>
+                <th class="sortable" data-sort="salary" data-col="salary">Monthly Salary</th>
+                <th class="sortable" data-sort="phone" data-col="phone">Phone Number</th>
+                <th class="sortable" data-sort="email" data-col="email">Email Address</th>
+                <th class="sortable" data-sort="joinDate" data-col="doj">Date of Joining</th>
+                <th class="sortable" data-sort="leaveDate" data-col="leaveDate">Date of Leaving</th>
+                <th class="sortable" data-sort="bankName" data-col="bank">Bank Name</th>
+                <th class="sortable" data-sort="bankAccountNo" data-col="account">Bank A/C No</th>
+                <th class="sortable" data-sort="bankIfscCode" data-col="ifsc">IFSC Code</th>
+                <th class="sortable" data-sort="panTaxNo" data-col="pan">PAN Number</th>
               </tr>
             </thead>
             <tbody id="employees-tbody">
@@ -434,19 +355,123 @@
       </div>
     </section>
 
+    <!-- Complete Employee Info / Add / Edit Card Modal -->
+    <div id="emp-card-modal" class="modal-overlay" style="display: none;">
+      <div class="employee-card-modal" role="dialog" aria-modal="true" aria-labelledby="emp-card-title">
+        <div class="employee-card-header">
+          <div class="emp-header-info">
+            <div class="emp-avatar" id="emp-card-avatar">👤</div>
+            <div>
+              <h3 id="emp-card-title">Employee Details</h3>
+              <span class="emp-id-pill" id="emp-card-id-pill">EMP001</span>
+            </div>
+          </div>
+          <button type="button" class="employee-card-close" id="emp-card-close-btn" title="Close Card">&times;</button>
+        </div>
+
+        <!-- View Mode: Displays Complete Information -->
+        <div class="employee-card-body" id="emp-card-view-mode">
+          <!-- Filled dynamically by employees.js -->
+        </div>
+
+        <!-- Form Mode: Inline Form for Adding or Editing Employee Details -->
+        <div class="employee-card-body" id="emp-card-form-mode" style="display: none;">
+          <!-- Filled dynamically by employees.js -->
+        </div>
+
+        <!-- Footer Actions: Side-by-side buttons -->
+        <div class="employee-card-footer">
+          <div class="employee-card-actions-left" id="emp-card-actions-left">
+            <button type="button" class="btn btn-primary" id="emp-card-edit-btn">✏️ Edit Details</button>
+            <button type="button" class="btn btn-danger" id="emp-card-remove-btn">🗑️ Remove Employee</button>
+          </div>
+          <div>
+            <button type="button" class="btn btn-secondary" id="emp-card-dismiss-btn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 6: ROLE MANAGEMENT                    -->
+    <!-- ========================================== -->
+    <section id="roles-tab" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Role &amp; Salary Management (<span id="role-total-count">0</span> Roles)</h2>
+          </div>
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="role-search-input" class="form-control" placeholder="🔍 Search roles..." style="width: 220px;" />
+            <button type="button" id="open-add-role-btn" class="btn btn-primary" style="white-space: nowrap;">+ Add New Role</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="roles-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">#</th>
+                <th class="sortable" data-sort="id" style="width: 130px;" title="Click to sort by Role ID">Role ID</th>
+                <th class="sortable" data-sort="name" title="Click to sort by Role Designation">Role Title / Designation</th>
+                <th class="sortable" data-sort="salary" title="Click to sort by Monthly Salary">Monthly Base Salary (₹)</th>
+                <th style="text-align: right; width: 180px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="roles-tbody">
+              <!-- Dynamically populated by roles.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Role Add / Edit Modal -->
+    <div id="role-edit-modal" class="modal-overlay" style="display: none;">
+      <div class="employee-card-modal" style="max-width: 480px;" role="dialog" aria-modal="true" aria-labelledby="role-modal-title">
+        <div class="employee-card-header">
+          <div class="emp-header-info">
+            <div class="emp-avatar">💼</div>
+            <div>
+              <h3 id="role-modal-title">Role Configuration</h3>
+              <span class="emp-id-pill">Role Master</span>
+            </div>
+          </div>
+          <button type="button" class="employee-card-close" id="role-modal-close-btn" title="Close">&times;</button>
+        </div>
+
+        <div class="employee-card-body" style="padding: 1.5rem;">
+          <form id="role-form" novalidate onsubmit="return false;">
+            <div class="card-edit-group" style="margin-bottom: 1.25rem;">
+              <label for="modal-role-name">Designation / Role Title *</label>
+              <input type="text" id="modal-role-name" class="form-control" placeholder="e.g. HR MANAGER" style="text-transform: uppercase;" required />
+            </div>
+            <div class="card-edit-group">
+              <label for="modal-role-salary">Fixed Monthly Salary (₹/month) *</label>
+              <input type="number" step="any" min="1" id="modal-role-salary" class="form-control" placeholder="e.g. 20000" required />
+            </div>
+          </form>
+        </div>
+
+        <div class="employee-card-footer" style="justify-content: flex-end; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary" id="role-modal-cancel-btn">Cancel</button>
+          <button type="button" class="btn btn-success" id="role-modal-save-btn">💾 Save Role</button>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Notification Toast Container -->
   <div id="toast-container"></div>
 
-  <!-- JavaScript Modules -->
-  <script src="js/api.js"></script>
-  <script src="js/employees.js"></script>
-  <script src="js/payroll-single.js"></script>
-  <script src="js/payroll-bulk.js"></script>
-  <script src="js/salary-sheet.js"></script>
-  <script src="js/payslip.js"></script>
-  <script src="js/app.js"></script>
+  <!-- JavaScript Modules with Cache Busting -->
+  <script src="js/utils.js?v=25"></script>
+  <script src="js/api.js?v=25"></script>
+  <script src="js/roles.js?v=25"></script>
+  <script src="js/employees.js?v=25"></script>
+  <script src="js/salary-sheet.js?v=25"></script>
+  <script src="js/payslip.js?v=25"></script>
+  <script src="js/app.js?v=25"></script>
 </body>
 </html>
-

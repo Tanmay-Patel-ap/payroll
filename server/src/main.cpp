@@ -1,6 +1,7 @@
 #include "server.h"
 #include "repositories/JsonEmployeeRepository.hpp"
 #include "repositories/JsonPayrollRepository.hpp"
+#include "repositories/JsonRoleRepository.hpp"
 #include "utils/FileUtils.hpp"
 #include "utils/Logger.hpp"
 
@@ -18,18 +19,19 @@ int main(int argc, char* argv[]) {
     }
 
     std::string dataDir = "data";
-    if (!FileUtils::fileExists("data") && FileUtils::fileExists("server/data")) {
+    if (FileUtils::fileExists("server/data") || FileUtils::fileExists("server/data/employees.json")) {
         dataDir = "server/data";
     }
     FileUtils::ensureDirectoryExists(dataDir);
 
     auto employeeRepo = std::make_shared<JsonEmployeeRepository>(dataDir + "/employees.json");
     auto payrollRepo = std::make_shared<JsonPayrollRepository>(dataDir + "/payroll.json");
+    auto roleRepo = std::make_shared<JsonRoleRepository>(dataDir + "/roles.json");
 
-    // Perform initial Excel synchronization on start
-    std::system("python server/excel_sync.py 2>nul || python excel_sync.py 2>nul");
+    // Perform initial Excel synchronization and startup employee check on start
+    std::system("python server/excel_sync.py --startup-check 2>nul || python excel_sync.py --startup-check 2>nul");
 
-    runServer(config, employeeRepo, payrollRepo);
+    runServer(config, employeeRepo, payrollRepo, roleRepo);
 
     return 0;
 }

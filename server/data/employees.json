@@ -1,32 +1,36 @@
 [
   {
-    "baseSalary":  65000,
-    "designation":  "Senior Accountant",
-    "name":  "John Doe",
-    "id":  "EMP001"
+    "id": "EMP001",
+    "name": "Tanmay",
+    "designation": "HR",
+    "salary": 20000.0,
+    "monthlySalary": 20000.0,
+    "baseSalary": 20000.0,
+    "email": "",
+    "phone": "9285186964",
+    "joinDate": "2024-04-01",
+    "leaveDate": "",
+    "bankName": "",
+    "bankAccountNo": "",
+    "bankIfscCode": "",
+    "panTaxNo": "",
+    "isActive": true
   },
   {
-    "baseSalary":  85000,
-    "designation":  "Finance Manager",
-    "name":  "Sarah Smith",
-    "id":  "EMP002"
-  },
-  {
-    "baseSalary":  42000,
-    "designation":  "Junior Auditor",
-    "name":  "David Miller",
-    "id":  "EMP003"
-  },
-  {
-    "baseSalary":  50000,
-    "designation":  "Payroll Specialist",
-    "name":  "Emma Watson",
-    "id":  "EMP004"
-  },
-  {
-    "baseSalary":  75000,
-    "designation":  "Tax Consultant",
-    "name":  "Robert Brown",
-    "id":  "EMP006"
+    "id": "EMP002",
+    "name": "Tanmay Patel",
+    "designation": "HR",
+    "salary": 20000.0,
+    "monthlySalary": 20000.0,
+    "baseSalary": 20000.0,
+    "email": "",
+    "phone": "",
+    "joinDate": "2024-04-01",
+    "leaveDate": "2026-08-24",
+    "bankName": "",
+    "bankAccountNo": "",
+    "bankIfscCode": "",
+    "panTaxNo": "",
+    "isActive": false
   }
 ]

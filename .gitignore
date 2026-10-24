@@ -1,13 +1,18 @@
 # Compiled binaries and build artifacts
 *.exe
+*.old
+*.bak
 *.obj
 *.o
 *.pdb
 server/build/
+__pycache__/
+*.pyc
 
 # Temporary Excel lock files
 ~$*
 ~$*.xlsx
+.payslip_hashes.json
 
 # Operating system / IDE files
 .vscode/
