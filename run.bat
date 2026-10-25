@@ -5,19 +5,15 @@ echo ======================================================
 
 cd /d "%~dp0"
 
-if not exist "server\payroll_server.exe" (
-    echo [INFO] server\payroll_server.exe not found. Building now...
-    call build.bat
-    if not exist "server\payroll_server.exe" (
-        echo [ERROR] Build failed! Unable to start server.
-        pause
-        exit /b 1
-    )
-)
-
 echo Opening http://localhost:8080 in your browser...
 start http://localhost:8080
 
-cd server
-payroll_server.exe 8080
-pause
+echo [INFO] Running Direct Excel Payroll Server on port 8080...
+python server/app.py 8080
+
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Server terminated or Python was not found.
+    echo Please ensure Python is installed and available on your PATH.
+    pause
+)

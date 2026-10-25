@@ -38,6 +38,7 @@ EMPLOYEES_JSON = find_data_file("employees.json")
 PAYROLL_JSON = find_data_file("payroll.json")
 ROLES_JSON = find_data_file("roles.json")
 
+os.makedirs(os.path.dirname(EMPLOYEES_JSON), exist_ok=True)
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(CENTRAL_DIR, exist_ok=True)
 os.makedirs(INDIVIDUAL_DIR, exist_ok=True)
@@ -126,21 +127,23 @@ def clean_float(val, default=0.0):
     except ValueError:
         return default
 
-def import_employee_info():
+def import_employee_info(write_json=False):
     excel_path = os.path.join(DATA_DIR, "employee_info.xlsx")
     if not os.path.exists(excel_path):
         print(f"[Sync] {excel_path} not found on disk. Clearing employee and role database.")
-        with open(EMPLOYEES_JSON, "w", encoding="utf-8") as f:
-            json.dump([], f, indent=2)
-        with open(ROLES_JSON, "w", encoding="utf-8") as f:
-            json.dump([], f, indent=2)
-        return
+        if write_json:
+            os.makedirs(os.path.dirname(EMPLOYEES_JSON), exist_ok=True)
+            with open(EMPLOYEES_JSON, "w", encoding="utf-8") as f:
+                json.dump([], f, indent=2)
+            with open(ROLES_JSON, "w", encoding="utf-8") as f:
+                json.dump([], f, indent=2)
+        return [], []
 
     try:
         wb = openpyxl.load_workbook(excel_path, data_only=True)
     except Exception as e:
         print(f"[Sync ERROR] Could not open {excel_path}: {e}", file=sys.stderr)
-        return
+        return [], []
 
     employees = []
     if "Employee Master" in wb.sheetnames:
@@ -244,18 +247,23 @@ def import_employee_info():
                 "salary": r_sal
             })
 
-    with open(EMPLOYEES_JSON, "w", encoding="utf-8") as f:
-        json.dump(employees, f, indent=2)
-    with open(ROLES_JSON, "w", encoding="utf-8") as f:
-        json.dump(roles, f, indent=2)
+    if write_json:
+        os.makedirs(os.path.dirname(EMPLOYEES_JSON), exist_ok=True)
+        with open(EMPLOYEES_JSON, "w", encoding="utf-8") as f:
+            json.dump(employees, f, indent=2)
+        with open(ROLES_JSON, "w", encoding="utf-8") as f:
+            json.dump(roles, f, indent=2)
+        print(f"[Sync] Successfully imported {len(employees)} employees and {len(roles)} roles from {excel_path} -> JSON database.")
 
-    print(f"[Sync] Successfully imported {len(employees)} employees and {len(roles)} roles from {excel_path} -> JSON database.")
+    return employees, roles
 
-def import_payrolls():
+def import_payrolls(write_json=False):
     if not os.path.exists(CENTRAL_DIR):
-        with open(PAYROLL_JSON, "w", encoding="utf-8") as f:
-            json.dump([], f, indent=2)
-        return
+        if write_json:
+            os.makedirs(os.path.dirname(PAYROLL_JSON), exist_ok=True)
+            with open(PAYROLL_JSON, "w", encoding="utf-8") as f:
+                json.dump([], f, indent=2)
+        return []
 
     excel_files = [
         os.path.join(CENTRAL_DIR, f)
@@ -264,9 +272,11 @@ def import_payrolls():
     ]
 
     if not excel_files:
-        with open(PAYROLL_JSON, "w", encoding="utf-8") as f:
-            json.dump([], f, indent=2)
-        return
+        if write_json:
+            os.makedirs(os.path.dirname(PAYROLL_JSON), exist_ok=True)
+            with open(PAYROLL_JSON, "w", encoding="utf-8") as f:
+                json.dump([], f, indent=2)
+        return []
 
     all_records = []
     for file_path in excel_files:
@@ -351,10 +361,13 @@ def import_payrolls():
                     "remarks": remarks
                 })
 
-    with open(PAYROLL_JSON, "w", encoding="utf-8") as f:
-        json.dump(all_records, f, indent=2)
+    if write_json:
+        os.makedirs(os.path.dirname(PAYROLL_JSON), exist_ok=True)
+        with open(PAYROLL_JSON, "w", encoding="utf-8") as f:
+            json.dump(all_records, f, indent=2)
+        print(f"[Sync] Successfully imported {len(all_records)} payroll records from central payroll workbooks -> JSON database.")
 
-    print(f"[Sync] Successfully imported {len(all_records)} payroll records from central payroll workbooks -> JSON database.")
+    return all_records
 
 def number_to_words(n):
     num = int(round(n))
@@ -383,20 +396,21 @@ def get_financial_year(year, month):
         y2 = year % 100
     return f"{y1:02d}-{y2:02d}"
 
-def sync_employee_info():
-    if not os.path.exists(EMPLOYEES_JSON):
-        return
-    with open(EMPLOYEES_JSON, "r", encoding="utf-8") as f:
-        employees = json.load(f)
+def sync_employee_info(employees=None, roles=None):
+    if employees is None:
+        if not os.path.exists(EMPLOYEES_JSON):
+            return
+        with open(EMPLOYEES_JSON, "r", encoding="utf-8") as f:
+            employees = json.load(f)
 
-    # Load roles if available
-    roles = []
-    if os.path.exists(ROLES_JSON):
-        try:
-            with open(ROLES_JSON, "r", encoding="utf-8") as f:
-                roles = json.load(f)
-        except Exception as e:
-            print(f"[Sync WARN] Could not load roles.json: {e}", file=sys.stderr)
+    if roles is None:
+        roles = []
+        if os.path.exists(ROLES_JSON):
+            try:
+                with open(ROLES_JSON, "r", encoding="utf-8") as f:
+                    roles = json.load(f)
+            except Exception as e:
+                print(f"[Sync WARN] Could not load roles.json: {e}", file=sys.stderr)
 
     wb = openpyxl.Workbook()
 
@@ -544,11 +558,12 @@ def sync_employee_info():
     target_path = os.path.join(DATA_DIR, "employee_info.xlsx")
     safe_save_workbook(wb, target_path)
 
-def sync_payrolls():
-    if not os.path.exists(PAYROLL_JSON):
-        return
-    with open(PAYROLL_JSON, "r", encoding="utf-8") as f:
-        records = json.load(f)
+def sync_payrolls(records=None):
+    if records is None:
+        if not os.path.exists(PAYROLL_JSON):
+            return
+        with open(PAYROLL_JSON, "r", encoding="utf-8") as f:
+            records = json.load(f)
 
     records_by_fy = {}
     now = datetime.datetime.now()
@@ -786,7 +801,7 @@ def sync_payrolls():
 
         print(f"[Sync] Verified individual payslip PDFs inside {fy_folder}")
 
-def generate_single_slip_pdf(month, emp_id, force=True):
+def generate_single_slip_pdf(month, emp_id, force=True, record_override=None):
     """
     Generates and saves the individual payslip PDF for a given employee and month
     to the designated place: data/individual payrolls/<FY>/<MONTH>/<empId>_<name>_Payslip.pdf
@@ -805,6 +820,8 @@ def generate_single_slip_pdf(month, emp_id, force=True):
                 records = json.load(f)
         except Exception:
             records = []
+    if not records:
+        records = import_payrolls(write_json=False)
 
     # Load employees for metadata
     employees = []
@@ -814,11 +831,18 @@ def generate_single_slip_pdf(month, emp_id, force=True):
                 employees = json.load(f)
         except Exception:
             employees = []
+    if not employees:
+        employees, _ = import_employee_info(write_json=False)
 
     emp_meta = next((e for e in employees if e.get("id") == emp_id), {})
 
     # Find matching payroll record
     rec = next((r for r in records if r.get("month", "").strip().lower() == month.strip().lower() and r.get("employeeId") == emp_id), None)
+    if record_override and isinstance(record_override, dict):
+        if rec:
+            rec = {**rec, **record_override}
+        else:
+            rec = {**record_override, "month": month, "employeeId": emp_id}
 
     parts = month.strip().split()
     now = datetime.datetime.now()
@@ -950,7 +974,7 @@ def parse_ym_index(date_val, default_year=2024, default_month=4):
     except Exception:
         return default_year * 12 + default_month
 
-def ensure_all_employees_in_sheets():
+def ensure_all_employees_in_sheets(employees=None):
     """
     Checks every employee in employees.json / employee_info.xlsx.
     Ensures that for every month sheet from their month of joining (strictly FY 26-27 onwards),
@@ -960,17 +984,11 @@ def ensure_all_employees_in_sheets():
     """
     import calendar
 
-    # Always synchronize employee_info (imports if present, clears if deleted)
-    import_employee_info()
+    if employees is None:
+        employees, _ = import_employee_info(write_json=False)
 
-    if not os.path.exists(EMPLOYEES_JSON):
+    if not employees:
         return
-
-    try:
-        with open(EMPLOYEES_JSON, "r", encoding="utf-8") as f:
-            employees = json.load(f)
-    except Exception:
-        employees = []
 
     if not employees:
         return
