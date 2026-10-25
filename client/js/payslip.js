@@ -98,10 +98,23 @@ class PayslipViewer {
     sorted.forEach((emp) => {
       const opt = document.createElement('option');
       opt.value = emp.id;
-      opt.textContent = `${emp.name} (${emp.id})`;
+      opt.textContent = `${emp.name} (${emp.id})${emp.designation ? ' - ' + emp.designation : ''}`;
       this.empSelect.appendChild(opt);
     });
     if (current) this.empSelect.value = current;
+
+    const DropdownClass = window.LightSearchableDropdown || window.TrieDropdown;
+    if (DropdownClass) {
+      if (this.empSelect._lightDropdown || this.empSelect._trieDropdown) {
+        const dd = this.empSelect._lightDropdown || this.empSelect._trieDropdown;
+        if (typeof dd.rebuild === 'function') dd.rebuild();
+      } else {
+        DropdownClass.enhanceSelect(this.empSelect, {
+          placeholder: 'Select or type employee...',
+          allowCustom: false
+        });
+      }
+    }
   }
 
   async refreshMonthsList() {

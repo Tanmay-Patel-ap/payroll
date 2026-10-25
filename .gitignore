@@ -20,3 +20,10 @@ __pycache__/
 Thumbs.db
 Desktop.ini
 
+# User Payroll & Employee Excel Data (Local to each deployment)
+data/
+data_safety_backup*/
+backups/
+server/backup_config.json
+
+

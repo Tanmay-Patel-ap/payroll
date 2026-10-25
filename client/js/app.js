@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.employeeManager = new EmployeeManager(window.apiClient);
   window.salarySheetManager = new SalarySheetManager(window.apiClient);
   window.payslipViewer = new PayslipViewer(window.apiClient);
+  window.backupManager = new BackupManager(window.apiClient);
 
   // Load initial employees
   await window.employeeManager.loadEmployees();

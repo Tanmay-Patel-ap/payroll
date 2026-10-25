@@ -10,6 +10,92 @@ const DESIGNATION_SALARIES = {
   'DATA ENTRY': 17000
 };
 
+const INDIAN_BANKS_CATEGORIZED = {
+  "Public Sector Banks": [
+    "State Bank of India",
+    "Punjab National Bank",
+    "Bank of Baroda",
+    "Canara Bank",
+    "Union Bank of India",
+    "Bank of India",
+    "Indian Bank",
+    "Central Bank of India",
+    "Indian Overseas Bank",
+    "UCO Bank",
+    "Bank of Maharashtra",
+    "Punjab & Sind Bank"
+  ],
+  "Major Private Sector Banks": [
+    "HDFC Bank",
+    "ICICI Bank",
+    "Axis Bank",
+    "Kotak Mahindra Bank",
+    "IndusInd Bank",
+    "Yes Bank",
+    "Federal Bank",
+    "IDFC FIRST Bank",
+    "Bandhan Bank",
+    "South Indian Bank",
+    "RBL Bank"
+  ],
+  "Other Private Banks": [
+    "Karur Vysya Bank",
+    "City Union Bank",
+    "Jammu & Kashmir Bank",
+    "Karnataka Bank",
+    "Dhanlaxmi Bank",
+    "Tamilnad Mercantile Bank",
+    "CSB Bank",
+    "Nainital Bank"
+  ],
+  "Small Finance Banks": [
+    "AU Small Finance Bank",
+    "Equitas Small Finance Bank",
+    "Ujjivan Small Finance Bank",
+    "Jana Small Finance Bank",
+    "Capital Small Finance Bank",
+    "Fincare Small Finance Bank",
+    "Suryoday Small Finance Bank",
+    "Utkarsh Small Finance Bank",
+    "ESAF Small Finance Bank",
+    "North East Small Finance Bank",
+    "Shivalik Small Finance Bank",
+    "Unity Small Finance Bank"
+  ],
+  "Payments Banks": [
+    "Airtel Payments Bank",
+    "India Post Payments Bank",
+    "Fino Payments Bank",
+    "Paytm Payments Bank",
+    "Jio Payments Bank"
+  ],
+  "Regional Rural & Co-operative Banks": [
+    "Aryavart Bank",
+    "Baroda UP Bank",
+    "Dakshin Bihar Gramin Bank",
+    "Uttar Bihar Gramin Bank",
+    "Prathama UP Gramin Bank",
+    "Maharashtra Gramin Bank",
+    "Kerala Gramin Bank",
+    "Andhra Pradesh Grameena Vikas Bank",
+    "Karnataka Gramin Bank",
+    "Rajasthan Marudhara Gramin Bank",
+    "Saraswat Co-operative Bank",
+    "Cosmos Co-operative Bank",
+    "SVC Co-operative Bank",
+    "Bharat Co-operative Bank",
+    "Abhyudaya Co-operative Bank"
+  ],
+  "Foreign Banks in India": [
+    "Citibank",
+    "Standard Chartered Bank",
+    "HSBC Bank",
+    "Deutsche Bank",
+    "DBS Bank India",
+    "Barclays Bank"
+  ]
+};
+
 const FALLBACK_EMPLOYEES = [];
 
 class EmployeeManager {
@@ -465,6 +551,43 @@ class EmployeeManager {
     }
   }
 
+  getBankOptionsHtml(selectedBank = '') {
+    let html = `<option value="">-- Select Bank (All Indian Banks) --</option>`;
+    const curLower = (selectedBank || '').trim().toLowerCase();
+    let matched = false;
+
+    for (const [group, banks] of Object.entries(INDIAN_BANKS_CATEGORIZED)) {
+      html += `<optgroup label="${group}">`;
+      for (const b of banks) {
+        const isSel = (b.toLowerCase() === curLower) ? 'selected' : '';
+        if (isSel) matched = true;
+        html += `<option value="${this.escapeHtml(b)}" ${isSel}>${this.escapeHtml(b)}</option>`;
+      }
+      html += `</optgroup>`;
+    }
+
+    if (selectedBank && !matched) {
+      html += `<optgroup label="Custom / Other Registered Bank">`;
+      html += `<option value="${this.escapeHtml(selectedBank)}" selected>${this.escapeHtml(selectedBank)}</option>`;
+      html += `</optgroup>`;
+    }
+
+    html += `<option value="__OTHER__">Other Bank (Type Custom Below)...</option>`;
+    return html;
+  }
+
+  static handleBankSelectChange(selectElem) {
+    const customInput = document.getElementById('form-emp-bank-name-custom');
+    if (!customInput) return;
+    if (selectElem.value === '__OTHER__') {
+      customInput.style.display = 'block';
+      customInput.focus();
+    } else {
+      customInput.style.display = 'none';
+      customInput.value = '';
+    }
+  }
+
   getDesignationOptionsHtml(currentDesignation = '') {
     let rolesList = (this.roles && this.roles.length > 0) ? this.roles : [
       { id: 'ROLE001', name: 'HR MANAGER', salary: 20000 },
@@ -497,6 +620,23 @@ class EmployeeManager {
     const customGroup = document.getElementById('custom-desig-group');
     const customInput = document.getElementById('form-emp-custom-desig');
     const salaryInput = document.getElementById('form-emp-salary');
+    const bankSelect = document.getElementById('form-emp-bank-name');
+
+    if (window.LightSearchableDropdown || window.TrieDropdown) {
+      const DropdownClass = window.LightSearchableDropdown || window.TrieDropdown;
+      if (desigSelect && !desigSelect._lightDropdown) {
+        DropdownClass.enhanceSelect(desigSelect, {
+          placeholder: 'Select or type role...',
+          allowCustom: true
+        });
+      }
+      if (bankSelect && !bankSelect._lightDropdown) {
+        DropdownClass.enhanceSelect(bankSelect, {
+          placeholder: 'Select or type bank name...',
+          allowCustom: true
+        });
+      }
+    }
 
     if (desigSelect) {
       desigSelect.addEventListener('change', () => {
@@ -642,7 +782,10 @@ class EmployeeManager {
         <div class="emp-details-grid">
           <div class="card-edit-group">
             <label for="form-emp-bank-name">Bank Name</label>
-            <input type="text" id="form-emp-bank-name" class="form-control" placeholder="e.g. State Bank of India" />
+            <select id="form-emp-bank-name" class="form-control" onchange="EmployeeManager.handleBankSelectChange(this)">
+              ${this.getBankOptionsHtml('')}
+            </select>
+            <input type="text" id="form-emp-bank-name-custom" class="form-control" style="margin-top: 0.35rem; display: none;" placeholder="Enter custom bank name..." />
           </div>
           <div class="card-edit-group">
             <label for="form-emp-account-no">Account Number</label>
@@ -754,7 +897,10 @@ class EmployeeManager {
         <div class="emp-details-grid">
           <div class="card-edit-group">
             <label for="form-emp-bank-name">Bank Name</label>
-            <input type="text" id="form-emp-bank-name" class="form-control" value="${this.escapeHtml(emp.bankName || '')}" />
+            <select id="form-emp-bank-name" class="form-control" onchange="EmployeeManager.handleBankSelectChange(this)">
+              ${this.getBankOptionsHtml(emp.bankName || '')}
+            </select>
+            <input type="text" id="form-emp-bank-name-custom" class="form-control" style="margin-top: 0.35rem; display: none;" placeholder="Enter custom bank name..." />
           </div>
           <div class="card-edit-group">
             <label for="form-emp-account-no">Account Number</label>
@@ -815,7 +961,10 @@ class EmployeeManager {
     const leaveDate = (document.getElementById('form-emp-leave-date')?.value || '').trim();
     const phone = (document.getElementById('form-emp-phone')?.value || '').trim();
     const email = (document.getElementById('form-emp-email')?.value || '').trim();
-    const bankName = (document.getElementById('form-emp-bank-name')?.value || '').trim();
+    let bankName = (document.getElementById('form-emp-bank-name')?.value || '').trim();
+    if (bankName === '__OTHER__') {
+      bankName = (document.getElementById('form-emp-bank-name-custom')?.value || '').trim();
+    }
     const bankAccountNo = (document.getElementById('form-emp-account-no')?.value || '').trim();
     const bankIfscCode = (document.getElementById('form-emp-ifsc')?.value || '').trim().toUpperCase();
     const panTaxNo = (document.getElementById('form-emp-pan')?.value || '').trim().toUpperCase();
@@ -917,7 +1066,10 @@ class EmployeeManager {
     const leaveDate = (document.getElementById('form-emp-leave-date')?.value || '').trim();
     const phone = (document.getElementById('form-emp-phone')?.value || '').trim();
     const email = (document.getElementById('form-emp-email')?.value || '').trim();
-    const bankName = (document.getElementById('form-emp-bank-name')?.value || '').trim();
+    let bankName = (document.getElementById('form-emp-bank-name')?.value || '').trim();
+    if (bankName === '__OTHER__') {
+      bankName = (document.getElementById('form-emp-bank-name-custom')?.value || '').trim();
+    }
     const bankAccountNo = (document.getElementById('form-emp-account-no')?.value || '').trim();
     const bankIfscCode = (document.getElementById('form-emp-ifsc')?.value || '').trim().toUpperCase();
     const panTaxNo = (document.getElementById('form-emp-pan')?.value || '').trim().toUpperCase();

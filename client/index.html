@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>STIFLINK MANAGEMENT (OPC) PVT. LTD - Payroll &amp; Payslips</title>
-  <link rel="stylesheet" href="css/style.css?v=11" />
+  <link rel="stylesheet" href="css/style.css?v=28" />
 </head>
 <body>
 
@@ -35,6 +35,11 @@
         <span>💼</span> Role Management
       </button>
     </nav>
+    <div class="nav-right-actions">
+      <button id="btn-open-backup-modal" class="btn-nav-backup" title="Backup & Restore Data">
+        <span>📦</span> Backup &amp; Restore
+      </button>
+    </div>
   </div>
 
   <!-- Main Workspace Container -->
@@ -460,18 +465,183 @@
       </div>
     </div>
 
+    <!-- ========================================== -->
+    <!-- MODAL: BACKUP & RESTORE DATA               -->
+    <!-- ========================================== -->
+    <div id="backup-restore-modal" class="modal-overlay">
+      <div class="employee-card-modal" style="max-width: 650px;">
+        <div class="employee-card-header" style="background: linear-gradient(135deg, #1e3a8a, #0284c7);">
+          <div class="employee-card-title-group">
+            <h2 style="color: #fff; display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 1.25rem;">
+              <span>📦</span> Data Backup &amp; Disaster Recovery
+            </h2>
+            <span class="employee-card-id" style="background: rgba(255,255,255,0.2); color: #fff;">System Utility</span>
+          </div>
+          <button type="button" class="employee-card-close" id="backup-modal-close-btn" title="Close" style="color: #fff;">&times;</button>
+        </div>
+
+        <div class="employee-card-body" style="padding: 1.5rem;">
+          <!-- Tabs inside Modal: Backup vs Restore vs Automated Backup -->
+          <div class="backup-tab-nav" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.6rem;">
+            <button type="button" id="tab-btn-backup" class="btn btn-primary" style="flex: 1; font-weight: 600;">📁 Backup</button>
+            <button type="button" id="tab-btn-restore" class="btn btn-secondary" style="flex: 1; font-weight: 600;">🔄 Restore</button>
+            <button type="button" id="tab-btn-auto" class="btn btn-secondary" style="flex: 1.2; font-weight: 600;">⏰ Automated Backup</button>
+          </div>
+
+          <!-- BACKUP VIEW -->
+          <div id="backup-view-pane">
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem; font-size: 0.88rem; color: #166534;">
+              <strong>ℹ️ Complete Data Backup:</strong> Copies all Employee Master Info, Central Payroll Excel Workbooks, and Individual Payslip PDFs.
+            </div>
+
+            <div class="card-edit-group" style="margin-bottom: 1rem;">
+              <label for="backup-target-path" style="font-weight: 600;">Backup Destination Folder (Local Directory)</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="backup-target-path" class="form-control" placeholder="e.g. D:\PayrollBackups or C:\Backups" style="flex: 1;" />
+                <button type="button" id="btn-browse-backup-path" class="btn btn-outline" style="white-space: nowrap; font-weight: 600;" title="Browse to select any folder on computer">📁 Browse...</button>
+                <button type="button" id="btn-set-default-path" class="btn btn-outline" style="white-space: nowrap;" title="Set default path">Use Default</button>
+              </div>
+              <small style="color: var(--text-secondary); margin-top: 0.35rem; display: block;">Select or type any destination folder on your computer. All payroll files will be safely duplicated.</small>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap;">
+              <button type="button" id="btn-execute-folder-backup" class="btn btn-success" style="flex: 1.2; padding: 0.7rem 1rem; font-weight: 600;">
+                📁 Copy Backup to Folder
+              </button>
+              <button type="button" id="btn-download-backup-zip" class="btn btn-primary" style="flex: 1; padding: 0.7rem 1rem; font-weight: 600;">
+                ⬇️ Download ZIP Backup
+              </button>
+            </div>
+          </div>
+
+          <!-- RESTORE VIEW -->
+          <div id="restore-view-pane" style="display: none;">
+            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem; font-size: 0.88rem; color: #92400e;">
+              <strong>⚠️ Safety Note:</strong> Restoring data updates your active database with the backup copy. An automatic safety snapshot of your current data is saved before restoration.
+            </div>
+
+            <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: var(--bg-surface);">
+              <label for="restore-source-path" style="font-weight: 600; display: block; margin-bottom: 0.4rem;">Option 1: Restore from Folder Path</label>
+              <div style="display: flex; gap: 0.5rem; margin-bottom: 0.6rem;">
+                <input type="text" id="restore-source-path" class="form-control" placeholder="e.g. D:\PayrollBackups\backup_2026-10-25" style="flex: 1;" />
+                <button type="button" id="btn-browse-restore-path" class="btn btn-outline" style="white-space: nowrap; font-weight: 600;" title="Browse to backup folder">📁 Browse...</button>
+              </div>
+              <button type="button" id="btn-execute-folder-restore" class="btn btn-warning" style="width: 100%; font-weight: 600;">
+                🔄 Restore from Folder Path
+              </button>
+            </div>
+
+            <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: var(--bg-surface);">
+              <label for="restore-zip-input" style="font-weight: 600; display: block; margin-bottom: 0.4rem;">Option 2: Restore from Backup ZIP File</label>
+              <input type="file" id="restore-zip-input" accept=".zip" class="form-control" style="margin-bottom: 0.6rem;" />
+              <button type="button" id="btn-execute-zip-restore" class="btn btn-warning" style="width: 100%; font-weight: 600;">
+                📤 Upload &amp; Restore ZIP
+              </button>
+            </div>
+          </div>
+
+          <!-- AUTOMATED BACKUP VIEW -->
+          <div id="auto-backup-pane" style="display: none;">
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem; font-size: 0.88rem; color: #1e40af;">
+              <strong>⏰ Automated Scheduled Backup:</strong> Automatically copies your entire data directory in the background at regular intervals (hours or days) with automatic pruning of older copies.
+            </div>
+
+            <!-- Enable Toggle -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.9rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">Automated Backup Status</div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary);">Enable background automatic timer to create periodic snapshots.</div>
+              </div>
+              <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer; font-weight: 600; font-size: 0.95rem;">
+                <input type="checkbox" id="auto-backup-enabled" style="width: 1.25rem; height: 1.25rem; accent-color: #2563eb;" />
+                <span id="auto-backup-enabled-label" style="color: #64748b;">Disabled</span>
+              </label>
+            </div>
+
+            <!-- Interval Period -->
+            <div class="card-edit-group" style="margin-bottom: 1rem;">
+              <label style="font-weight: 600;">Backup Frequency / Period *</label>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span style="font-size: 0.88rem; color: var(--text-secondary);">Run every</span>
+                <input type="number" id="auto-backup-interval-value" class="form-control" min="1" max="365" value="6" style="width: 90px; font-weight: 600; text-align: center;" />
+                <select id="auto-backup-interval-unit" class="form-control" style="width: 130px; font-weight: 600;">
+                  <option value="hours" selected>Hour(s)</option>
+                  <option value="days">Day(s)</option>
+                </select>
+              </div>
+              <small style="color: var(--text-secondary); margin-top: 0.35rem; display: block;">Select interval in hours (e.g. every 2, 4, 6, 12 hours) or days (e.g. every 1, 3, 7 days).</small>
+            </div>
+
+            <!-- Destination Folder with Browse Button -->
+            <div class="card-edit-group" style="margin-bottom: 1rem;">
+              <label for="auto-backup-dest-folder" style="font-weight: 600;">Destination Directory</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="auto-backup-dest-folder" class="form-control" placeholder="e.g. C:\PayrollBackups\Auto" style="flex: 1;" />
+                <button type="button" id="btn-browse-auto-backup-dest" class="btn btn-outline" style="white-space: nowrap; font-weight: 600;" title="Browse to select folder">📁 Browse...</button>
+              </div>
+              <small style="color: var(--text-secondary); margin-top: 0.35rem; display: block;">Each automated run creates a timestamped subfolder inside this directory.</small>
+            </div>
+
+            <!-- Retention Copies -->
+            <div class="card-edit-group" style="margin-bottom: 1.25rem;">
+              <label for="auto-backup-keep-copies" style="font-weight: 600;">Retention Limit (Maximum Backup Copies)</label>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="number" id="auto-backup-keep-copies" class="form-control" min="1" max="100" value="10" style="width: 90px; font-weight: 600; text-align: center;" />
+                <span style="font-size: 0.88rem; color: var(--text-secondary);">latest backups kept (older snapshots automatically removed to save disk space)</span>
+              </div>
+            </div>
+
+            <!-- Live Status Banner -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem; font-size: 0.84rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span style="color: #64748b;">Last Automated Backup:</span>
+                <strong id="auto-backup-last-time" style="color: #0f172a;">None yet</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span style="color: #64748b;">Last Status:</span>
+                <span id="auto-backup-last-status" style="font-weight: 600; color: #64748b;">N/A</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: #64748b;">Last Path:</span>
+                <span id="auto-backup-last-path" style="font-family: monospace; font-size: 0.78rem; color: #334155; word-break: break-all;">-</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 0.75rem;">
+              <button type="button" id="btn-save-auto-backup-config" class="btn btn-success" style="flex: 1.2; padding: 0.7rem 1rem; font-weight: 600;">
+                💾 Save Auto-Backup Settings
+              </button>
+              <button type="button" id="btn-run-auto-backup-now" class="btn btn-primary" style="flex: 1; padding: 0.7rem 1rem; font-weight: 600;">
+                ⚡ Run Backup Now
+              </button>
+            </div>
+          </div>
+
+          <!-- Feedback Status Box -->
+          <div id="backup-status-box" style="display: none; margin-top: 1.25rem; padding: 0.85rem; border-radius: 8px; font-size: 0.88rem;"></div>
+        </div>
+
+        <div class="employee-card-footer" style="justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" id="backup-modal-done-btn">Close</button>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Notification Toast Container -->
   <div id="toast-container"></div>
 
   <!-- JavaScript Modules with Cache Busting -->
-  <script src="js/utils.js?v=25"></script>
-  <script src="js/api.js?v=25"></script>
-  <script src="js/roles.js?v=25"></script>
-  <script src="js/employees.js?v=25"></script>
-  <script src="js/salary-sheet.js?v=25"></script>
-  <script src="js/payslip.js?v=25"></script>
-  <script src="js/app.js?v=25"></script>
+  <script src="js/utils.js?v=28"></script>
+  <script src="js/api.js?v=28"></script>
+  <script src="js/trie-search.js?v=28"></script>
+  <script src="js/roles.js?v=28"></script>
+  <script src="js/employees.js?v=28"></script>
+  <script src="js/salary-sheet.js?v=28"></script>
+  <script src="js/payslip.js?v=28"></script>
+  <script src="js/backup.js?v=28"></script>
+  <script src="js/app.js?v=28"></script>
 </body>
 </html>

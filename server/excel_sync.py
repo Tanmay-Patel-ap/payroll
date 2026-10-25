@@ -65,11 +65,13 @@ def safe_save_workbook(wb, file_path, max_attempts=3):
     """
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
+    success = False
     for attempt in range(1, max_attempts + 1):
         try:
             wb.save(file_path)
             print(f"[Sync] Updated {file_path}")
-            return True
+            success = True
+            break
         except PermissionError:
             if attempt == 1:
                 force_close_excel()
@@ -77,12 +79,15 @@ def safe_save_workbook(wb, file_path, max_attempts=3):
                 time.sleep(0.8)
             else:
                 print(f"[Sync WARN] File '{file_path}' is currently open in Excel. Changes will sync once closed.", file=sys.stderr)
-                return False
         except Exception as e:
             print(f"[Sync ERROR] Attempt {attempt} failed to save '{file_path}': {e}", file=sys.stderr)
-            return False
+            break
 
-    return False
+    try:
+        wb.close()
+    except Exception:
+        pass
+    return success
 
 # Styling Constants
 FONT_TITLE = Font(name="Calibri", size=15, bold=True, color="1E3A8A")
@@ -247,6 +252,11 @@ def import_employee_info(write_json=False):
                 "salary": r_sal
             })
 
+    try:
+        wb.close()
+    except Exception:
+        pass
+
     if write_json:
         os.makedirs(os.path.dirname(EMPLOYEES_JSON), exist_ok=True)
         with open(EMPLOYEES_JSON, "w", encoding="utf-8") as f:
@@ -360,6 +370,11 @@ def import_payrolls(write_json=False):
                     "netSalary": net_sal,
                     "remarks": remarks
                 })
+
+        try:
+            wb.close()
+        except Exception:
+            pass
 
     if write_json:
         os.makedirs(os.path.dirname(PAYROLL_JSON), exist_ok=True)
@@ -890,7 +905,7 @@ def generate_single_slip_pdf(month, emp_id, force=True, record_override=None):
             "employeeId": emp_id,
             "employeeName": emp_meta.get("name", "Employee"),
             "designation": emp_meta.get("designation", "Staff"),
-            "bankName": emp_meta.get("bankName", "State Bank of India"),
+            "bankName": emp_meta.get("bankName", ""),
             "bankAccountNo": emp_meta.get("bankAccountNo", ""),
             "bankIfscCode": emp_meta.get("bankIfscCode", ""),
             "panTaxNo": emp_meta.get("panTaxNo", ""),
@@ -1212,6 +1227,11 @@ def ensure_all_employees_in_sheets(employees=None):
         if workbook_modified or not os.path.exists(central_file):
             safe_save_workbook(wb, central_file)
             print(f"[Sync] Verified/updated employee rows in {central_file}")
+        else:
+            try:
+                wb.close()
+            except Exception:
+                pass
 
     # Clean up PAYROLL_JSON: remove any records for employees outside their working months
     if os.path.exists(PAYROLL_JSON):
